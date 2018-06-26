@@ -68,5 +68,6 @@ cmake_install.cmake
 *.out
 *.app
 
-# dependencies
-glfw
+# Dependencies
+
+dependencies
