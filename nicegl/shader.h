@@ -41,9 +41,7 @@ namespace nicegl
 				id = glCreateShader(GL_FRAGMENT_SHADER);
 			else if (type == ShaderType::GeometryShader)
 				id = glCreateShader(GL_GEOMETRY_SHADER);
-
-			status = ShaderStatus::Error;
-
+			
 			const char * source_pointer = shader_source.c_str();
 			glShaderSource(id, 1, &source_pointer, NULL);
 			glCompileShader(id);
@@ -52,6 +50,7 @@ namespace nicegl
 			glGetShaderiv(id, GL_COMPILE_STATUS, &compile_status);
 			if (!compile_status)
 			{
+				status = ShaderStatus::Error;
 				char log[1024];
 				glGetShaderInfoLog(id, 1024, NULL, log);
 				error_message = std::string{ log };

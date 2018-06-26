@@ -19,8 +19,8 @@ namespace nicegl
 
 	public:
 		Program(const std::initializer_list<Shader*> shaders) {
+			// create the program
 			id = glCreateProgram();
-			status = ShaderStatus::Error;
 
 			// attach shaders
 			for (auto it = shaders.begin(); it != shaders.end(); ++it) {
@@ -36,10 +36,13 @@ namespace nicegl
 			glGetShaderiv(id, GL_COMPILE_STATUS, &compile_status);
 			if (!compile_status)
 			{
+				status = ShaderStatus::Error;
+				// store the error message
 				char log[1024];
 				glGetShaderInfoLog(id, 1024, NULL, log);
 				error_message = std::string{ log };
 
+				// delete the program
 				glDeleteProgram(id);
 			}
 			else
