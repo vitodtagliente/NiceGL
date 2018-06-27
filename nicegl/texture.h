@@ -13,7 +13,7 @@ namespace nicegl
 	{
 		// Wrapping mode on S axis
 		unsigned int wrapS{ GL_REPEAT };
-		// Wrapping mode on T axis
+		// Wrapping mode on T axis 
 		unsigned int wrapT{ GL_REPEAT };
 		// Filtering mode if texture pixels < screen pixels
 		unsigned int filterMin{ GL_LINEAR };

@@ -50,38 +50,7 @@ int main(void)
 	// stb_image settings
 	stbi_set_flip_vertically_on_load(1);
 
-	float positions[] = {
-		-0.5f, -0.5f,
-		 0.5f, -0.5f,
-	 	 0.5f,  0.5f,
-		-0.5f,  0.5f 
-	};
-
-	VertexBuffer vb(positions, 4 * 2 * sizeof(float));
-	vb.bind();
-
-	// Vertex Array
-	VertexArray va;
-	
-	VertexBufferLayout layout;
-	layout.push<float>(2);
-	va.addBuffer(vb, layout);
-
-	unsigned int indices[] = {
-		0, 1, 2, 
-		2, 3, 0
-	};
-
-	IndexBuffer ib(indices, 6);
-	ib.bind();
-
-	va.unbind();
-	vb.unbind();
-	ib.unbind();
-
-	Renderer renderer;
-	Color background_color(0.2f, 0.0f, 0.3f);
-
+	// -----------------------------------
 	std::map<ShaderType, std::string> sources;
 	ShaderReader::parse("shaders/test.shader", sources);
 
@@ -111,6 +80,47 @@ int main(void)
 	}
 
 	program.unbind();
+	// ----------------------------------
+
+	float positions[] = {
+		-0.5f, -0.5f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 1.0f, 0.0f,
+	 	 0.5f,  0.5f, 1.0f, 1.0f,
+		-0.5f,  0.5f, 0.0f, 1.0f
+	};
+
+	VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+	vb.bind();
+
+	// Vertex Array
+	VertexArray va;
+	
+	VertexBufferLayout layout;
+	layout.push<float>(2);
+	layout.push<float>(2);
+	va.addBuffer(vb, layout);
+
+	unsigned int indices[] = {
+		0, 1, 2, 
+		2, 3, 0
+	};
+
+	IndexBuffer ib(indices, 6);
+	ib.bind();
+
+	va.unbind();
+	vb.unbind();
+	ib.unbind();
+
+	// load texture
+	unsigned char * image_data;
+	int width, height, num_components;
+	image_data = stbi_load("textures/wall.jpg", &width, &height, &num_components, 4);
+	Texture texture(image_data, width, height, num_components);
+	stbi_image_free(image_data);
+
+	Renderer renderer;
+	Color background_color(0.2f, 0.25f, 0.3f, 1.0f);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -119,6 +129,9 @@ int main(void)
 
 		program.bind();
 		program.set("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
+
+		texture.bind();
+		program.set("u_Texture", 0);
 
 		va.bind();
 		ib.bind();
