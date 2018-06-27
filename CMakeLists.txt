@@ -21,6 +21,7 @@ include_directories(
 	include/
     vendor/glad/include/
 	vendor/glm/
+	vendor/stb
 )
 
 file(GLOB VENDORS_SOURCES 

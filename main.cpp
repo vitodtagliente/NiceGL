@@ -4,6 +4,9 @@
 
 #include "nicegl/nicegl.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using namespace nicegl;
 using namespace std;
 
@@ -43,6 +46,9 @@ int main(void)
 
 	// swap interval or vsync
 	glfwSwapInterval(1);
+
+	// stb_image settings
+	stbi_set_flip_vertically_on_load(1);
 
 	float positions[] = {
 		-0.5f, -0.5f,
