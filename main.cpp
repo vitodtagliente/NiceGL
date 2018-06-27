@@ -44,9 +44,6 @@ int main(void)
 	// swap interval or vsync
 	glfwSwapInterval(1);
 
-	// Vertex array
-	VertexArray va;
-
 	float positions[] = {
 		-0.5f, -0.5f,
 		 0.5f, -0.5f,
@@ -57,13 +54,12 @@ int main(void)
 	VertexBuffer vb(positions, 4 * 2 * sizeof(float));
 	vb.bind();
 
-	/*
+	// Vertex Array
+	VertexArray va;
+	
 	VertexBufferLayout layout;
 	layout.push<float>(2);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 	va.addBuffer(vb, layout);
-	*/
 
 	unsigned int indices[] = {
 		0, 1, 2, 
@@ -73,33 +69,54 @@ int main(void)
 	IndexBuffer ib(indices, 6);
 	ib.bind();
 
-	//va.unbind();
+	va.unbind();
 	vb.unbind();
 	ib.unbind();
 
 	Renderer renderer;
-	Color color{ 0.2f,0.0f,0.3f,1.0f };
+	Color background_color(0.2f, 0.0f, 0.3f);
 
-	std::string vs_source, fs_source;
-	ShaderReader::load("shaders/test.vs", vs_source);
-	ShaderReader::load("shaders/test.fs", fs_source);
-	VertexShader vs(vs_source);
+	std::map<ShaderType, std::string> sources;
+	ShaderReader::parse("shaders/test.shader", sources);
+
+	VertexShader vs(sources[ShaderType::VertexShader]);
 	if (vs.getStatus() == ShaderStatus::Error) {
 		cout << vs.getErrorMessage() << endl;
 	}
-	FragmentShader fs(fs_source);
+	else
+	{
+		cout << "Vertex Shader" << endl << endl;
+		cout << sources[ShaderType::VertexShader] << endl << endl;
+	}
+
+	FragmentShader fs(sources[ShaderType::FragmentShader]);
 	if (fs.getStatus() == ShaderStatus::Error) {
 		cout << fs.getErrorMessage() << endl;
 	}
+	else
+	{
+		cout << "Fragment Shader" << endl << endl;
+		cout << sources[ShaderType::FragmentShader] << endl << endl;
+	}
+
+	Program program({ &vs, &fs });
+	if (program.getStatus() == ShaderStatus::Error) {
+		cout << program.getErrorMessage() << endl;
+	}
+
+	program.unbind();
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
-		renderer.clear(color);
+		renderer.clear(background_color);
 
-		//va.bind();
-		//ib.bind();
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		program.bind();
+		program.set("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
+
+		va.bind();
+		ib.bind();
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);

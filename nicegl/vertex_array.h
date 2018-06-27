@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <assert.h>
 #include <vector>
 #include "vertex_buffer.h"
@@ -8,18 +9,24 @@ namespace nicegl
 {
 	struct VertexBufferElement
 	{
+		// the number of elements
 		unsigned int count;
+		// the type
 		unsigned int type;
 		unsigned char normalized;
-
-		static unsigned int getSizeOfType(unsigned int type) {
-			switch (type) {
-			case GL_FLOAT:return 4; break;
-			case GL_UNSIGNED_INT:return 4; break; 
-			case GL_UNSIGNED_BYTE:return 1; break;
-			}
-			assert(false);
-			return 0;
+		std::size_t size;
+		
+		VertexBufferElement(
+			const unsigned int _count, 
+			const unsigned int _type,
+			const std::size_t _size,
+			const unsigned char _normalized = GL_FALSE
+		) 
+		{
+			count = _count;
+			type = _type;
+			normalized = _normalized;
+			size = count * _size;
 		}
 	};
 
@@ -27,13 +34,12 @@ namespace nicegl
 	{
 	private:
 		std::vector<VertexBufferElement> elements;
-		unsigned int stride;
+		std::size_t stride;
 
 	public:
 		VertexBufferLayout()
-			: stride(0)
 		{
-
+			stride = 0;
 		}
 
 		template <typename T>
@@ -43,46 +49,47 @@ namespace nicegl
 
 		template <>
 		void push<float>(unsigned int count) {
-			elements.push_back({ GL_FLOAT, count, GL_FALSE });
-			stride += count * VertexBufferElement::getSizeOfType(GL_FLOAT);
+			VertexBufferElement element(count, GL_FLOAT, sizeof(float));
+			elements.push_back(element);
+			stride += element.size;
 		}
 
 		template <>
 		void push<unsigned int>(unsigned int count) {
-			elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
-			stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_INT);
+			VertexBufferElement element(count, GL_UNSIGNED_INT, sizeof(unsigned int));
+			elements.push_back(element);
+			stride += element.size;
 		}
 
 		template <>
 		void push<unsigned char>(unsigned int count) {
-			elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
-			stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_BYTE);
+			VertexBufferElement element(count, GL_UNSIGNED_BYTE, sizeof(unsigned int));
+			elements.push_back(element);
+			stride += element.size;
 		}
 
-		unsigned int getStride() const {
-			return stride;
-		}
-
-		const std::vector<VertexBufferElement> getElements() const {
-			return elements;
-		}
+		inline unsigned int getStride() const {	return stride; }
+		inline const std::vector<VertexBufferElement> getElements() const {	return elements; }
 	};
 
 	class VertexArray
 	{
 	private:
-		unsigned int render_id;
+		// vertex array id
+		unsigned int id{ 0 };
 
 	public:
 		VertexArray() {
-			glGenVertexArrays(1, &render_id);
+			// generate the vertex array
+			glGenVertexArrays(1, &id);
 		}
 
 		~VertexArray() {
-			glDeleteVertexArrays(1, &render_id);
+			glDeleteVertexArrays(1, &id);
 		}
 
 		void addBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout) {
+			bind();
 			vb.bind();
 			const auto& elements = layout.getElements();
 			unsigned int offset = 0;
@@ -94,16 +101,18 @@ namespace nicegl
 					layout.getStride(), 
 					(const void*)offset
 				 );
-				offset += element.count * VertexBufferElement::getSizeOfType(element.type);
+				offset += element.size;
 			}
 		}
 
 		void bind() const {
-			glBindVertexArray(render_id);
+			glBindVertexArray(id);
 		}
 
 		void unbind() const {
 			glBindVertexArray(0);
 		}
+
+		inline unsigned int getId() const { return id; }
 	};
 }

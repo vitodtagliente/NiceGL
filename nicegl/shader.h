@@ -115,12 +115,14 @@ namespace nicegl
 				ShaderType current_shader_type;
 				bool first_found{ false };
 				std::string source{};
-				while (std::getline(file, line)) {
+				while (std::getline(file, line)) {		
+
 					if (line.find("#shader") != std::string::npos)
 					{
 						if (first_found) {
 							sources[current_shader_type] = source;
 						}
+						else first_found = true;
 
 						if (line.find("vertex") != std::string::npos)
 							current_shader_type = ShaderType::VertexShader;
@@ -131,11 +133,14 @@ namespace nicegl
 
 						source.clear();
 					}
+					else source += line + "\n";
 
-					if (first_found) {
-						source += line + "\n";
-					}
 				}
+
+				if (first_found && !source.empty()) {
+					sources[current_shader_type] = source;
+				}
+
 				file.close();
 				return true;
 			}
