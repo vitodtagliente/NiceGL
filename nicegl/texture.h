@@ -72,7 +72,7 @@ namespace nicegl
 					this->image_format = GL_RGB;
 				else if (num_components == 4)
 					this->image_format = GL_RGBA;
-				this->internal_format = this->image_format;
+				this->internal_format = this->image_format; 
 
 				glTexImage2D(GL_TEXTURE_2D, 0, internal_format,	width, height, 
 					0, image_format, GL_UNSIGNED_BYTE, data_buffer

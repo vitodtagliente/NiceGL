@@ -52,7 +52,7 @@ int main(void)
 
 	// -----------------------------------
 	std::map<ShaderType, std::string> sources;
-	ShaderReader::parse("shaders/test.shader", sources);
+	ShaderReader::parse("shaders/texture.shader", sources);
 
 	VertexShader vs(sources[ShaderType::VertexShader]);
 	if (vs.getStatus() == ShaderStatus::Error) {
@@ -81,8 +81,8 @@ int main(void)
 
 	program.unbind();
 	// ----------------------------------
-
-	float positions[] = {
+	// position_x position_y uv_x uv_y
+	float positions[] = { 
 		-0.5f, -0.5f, 0.0f, 0.0f,
 		 0.5f, -0.5f, 1.0f, 0.0f,
 	 	 0.5f,  0.5f, 1.0f, 1.0f,
@@ -115,17 +115,23 @@ int main(void)
 	// load texture
 	unsigned char * image_data;
 	int width, height, num_components;
-	image_data = stbi_load("textures/wall.jpg", &width, &height, &num_components, 4);
+	image_data = stbi_load("textures/batman_logo.png", &width, &height, &num_components, 4);
 	Texture texture(image_data, width, height, num_components);
 	stbi_image_free(image_data);
 
 	Renderer renderer;
 	Color background_color(0.2f, 0.25f, 0.3f, 1.0f);
 
+	// enable blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		renderer.clear(background_color);
+
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		program.bind();
 		program.set("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
