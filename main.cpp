@@ -7,6 +7,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+// include ImGui
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 using namespace nicegl;
 using namespace std;
 
@@ -126,10 +130,18 @@ int main(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// ImGUI context
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(window, true);
+	ImGui::StyleColorsClassic();
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		renderer.clear(background_color);
+
+		// ImGui new frame
+		ImGui_ImplGlfwGL3_NewFrame();
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -143,6 +155,15 @@ int main(void)
 		ib.bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
+		// render ImGui window
+		ImGui::Text("Change background color:");
+		ImGui::SliderFloat("r", &background_color.r, 0.0f, 1.0f);
+		ImGui::SliderFloat("g", &background_color.g, 0.0f, 1.0f);
+		ImGui::SliderFloat("b", &background_color.b, 0.0f, 1.0f);
+
+		// Render ImGui
+		ImGui::Render();
+
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
@@ -150,6 +171,8 @@ int main(void)
 		glfwPollEvents();
 	}
 
+	// terminate ImGui
+	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
 	return 0;
 }

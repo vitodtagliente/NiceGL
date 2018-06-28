@@ -27,6 +27,7 @@ include_directories(
 
 file(GLOB VENDORS_SOURCES 
     vendor/glad/src/glad.c
+	vendor/imgui/src/*.cpp
 )
 file(GLOB PROJECT_HEADERS *.h include/*.h nicegl/*.h) 
 file(GLOB PROJECT_SOURCES *.cpp)
