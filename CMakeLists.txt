@@ -22,6 +22,7 @@ include_directories(
     vendor/glad/include/
 	vendor/glm/
 	vendor/stb
+	vendor/imgui/include
 )
 
 file(GLOB VENDORS_SOURCES 
