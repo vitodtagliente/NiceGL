@@ -156,6 +156,7 @@ int main(void)
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		// render ImGui window
+		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Text("Change background color:");
 		ImGui::SliderFloat("r", &background_color.r, 0.0f, 1.0f);
 		ImGui::SliderFloat("g", &background_color.g, 0.0f, 1.0f);
