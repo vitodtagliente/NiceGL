@@ -17,6 +17,9 @@ namespace nicegl
 		// error message
 		std::string error_message{};
 
+		// bind caching 
+		static unsigned int last_binded_id;
+
 	public:
 		Program(const std::initializer_list<Shader*> shaders) {
 			// create the program
@@ -62,11 +65,16 @@ namespace nicegl
 		}
 
 		void bind() const {
-			glUseProgram(id);
+			if (id != last_binded_id)
+			{
+				glUseProgram(id);
+				last_binded_id = id;
+			}
 		}
 
 		void unbind() const {
 			glUseProgram(0);
+			last_binded_id = 0;
 		}
 
 		inline unsigned int getId() const { return id; }
@@ -103,4 +111,7 @@ namespace nicegl
 			return location;
 		}
 	};
+
+	// program cache management
+	unsigned int Program::last_binded_id = 0;
 }
