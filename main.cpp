@@ -4,6 +4,7 @@
 
 #include "nicegl/nicegl.h"
 
+// image loading library
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -11,8 +12,15 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+// test applications
+#include "tests/tests.h"
+
 using namespace nicegl;
 using namespace std;
+
+tests::Application* create_test_application() {
+	return new tests::TriangleApplication();
+}
 
 int main(void)
 {
@@ -54,78 +62,6 @@ int main(void)
 	// stb_image settings
 	stbi_set_flip_vertically_on_load(1);
 
-	// -----------------------------------
-	std::map<ShaderType, std::string> sources;
-	ShaderReader::parse("shaders/texture.shader", sources);
-
-	VertexShader vs(sources[ShaderType::VertexShader]);
-	if (vs.getStatus() == ShaderStatus::Error) {
-		cout << vs.getErrorMessage() << endl;
-	}
-	else
-	{
-		cout << "Vertex Shader" << endl << endl;
-		cout << sources[ShaderType::VertexShader] << endl << endl;
-	}
-
-	FragmentShader fs(sources[ShaderType::FragmentShader]);
-	if (fs.getStatus() == ShaderStatus::Error) {
-		cout << fs.getErrorMessage() << endl;
-	}
-	else
-	{
-		cout << "Fragment Shader" << endl << endl;
-		cout << sources[ShaderType::FragmentShader] << endl << endl;
-	}
-
-	Program program({ &vs, &fs });
-	if (program.getStatus() == ShaderStatus::Error) {
-		cout << program.getErrorMessage() << endl;
-	}
-
-	program.unbind();
-	// ----------------------------------
-	// position_x position_y uv_x uv_y
-	float positions[] = { 
-		-0.5f, -0.5f, 0.0f, 0.0f,
-		 0.5f, -0.5f, 1.0f, 0.0f,
-	 	 0.5f,  0.5f, 1.0f, 1.0f,
-		-0.5f,  0.5f, 0.0f, 1.0f
-	};
-
-	VertexBuffer vb(positions, 4 * 4 * sizeof(float));
-	vb.bind();
-
-	// Vertex Array
-	VertexArray va;
-	
-	VertexBufferLayout layout;
-	layout.push<float>(2);
-	layout.push<float>(2);
-	va.addBuffer(vb, layout);
-
-	unsigned int indices[] = {
-		0, 1, 2, 
-		2, 3, 0
-	};
-
-	IndexBuffer ib(indices, 6);
-	ib.bind();
-
-	va.unbind();
-	vb.unbind();
-	ib.unbind();
-
-	// load texture
-	unsigned char * image_data;
-	int width, height, num_components;
-	image_data = stbi_load("textures/batman_logo.png", &width, &height, &num_components, 4);
-	Texture texture(image_data, width, height, num_components);
-	stbi_image_free(image_data);
-
-	Renderer renderer;
-	Color background_color(0.2f, 0.25f, 0.3f, 1.0f);
-
 	// enable blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -135,35 +71,36 @@ int main(void)
 	ImGui_ImplGlfwGL3_Init(window, true);
 	ImGui::StyleColorsClassic();
 
+	// test application
+	tests::Application* app{ nullptr };
+
+	// create test application
+	app = create_test_application();
+
+	// init application 
+	if (app) app->init();
+
+	float application_time{ 0.0f };
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
-		renderer.clear(background_color);
-
 		// ImGui new frame
-		ImGui_ImplGlfwGL3_NewFrame();
+		ImGui_ImplGlfwGL3_NewFrame();	
 
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		program.bind();
-		program.set("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
-
-		texture.bind();
-		program.set("u_Texture", 0);
-
-		va.bind();
-		ib.bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-		// render ImGui window
-		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::Text("Change background color:");
-		ImGui::SliderFloat("r", &background_color.r, 0.0f, 1.0f);
-		ImGui::SliderFloat("g", &background_color.g, 0.0f, 1.0f);
-		ImGui::SliderFloat("b", &background_color.b, 0.0f, 1.0f);
+		// update and render the application
+		if (app)
+		{
+			app->update(glfwGetTime() - application_time);
+			app->render();
+			app->gui();
+		}
 
 		// Render ImGui
 		ImGui::Render();
+
+		// update time
+		application_time += glfwGetTime();
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -171,6 +108,10 @@ int main(void)
 		/* Poll for and process events */
 		glfwPollEvents();
 	}
+
+	// uninit app
+	if (app) app->uninit();
+	delete app;
 
 	// terminate ImGui
 	ImGui_ImplGlfwGL3_Shutdown();
