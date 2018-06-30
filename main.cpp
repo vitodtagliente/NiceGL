@@ -19,7 +19,7 @@ using namespace nicegl;
 using namespace std;
 
 tests::Application* create_test_application() {
-	return new tests::TriangleApplication();
+	return new tests::SquareApplication();
 }
 
 int main(void)
@@ -91,7 +91,7 @@ int main(void)
 		// update and render the application
 		if (app)
 		{
-			app->update(glfwGetTime() - application_time);
+			app->update(glfwGetTime());
 			app->render();
 			app->gui();
 		}

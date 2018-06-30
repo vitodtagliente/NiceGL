@@ -78,6 +78,9 @@ namespace nicegl
 		// vertex array id
 		unsigned int id{ 0 };
 
+		// bind caching 
+		static unsigned int last_binded_id;
+
 	public:
 		VertexArray() {
 			// generate the vertex array
@@ -106,13 +109,21 @@ namespace nicegl
 		}
 
 		void bind() const {
-			glBindVertexArray(id);
+			if (id != last_binded_id)
+			{
+				glBindVertexArray(id);
+				last_binded_id = id;
+			}
 		}
 
 		void unbind() const {
 			glBindVertexArray(0);
+			last_binded_id = 0;
 		}
 
 		inline unsigned int getId() const { return id; }
 	};
+
+	// vertex array cache management
+	unsigned int VertexArray::last_binded_id = 0;
 }
