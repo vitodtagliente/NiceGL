@@ -4,7 +4,7 @@
 
 namespace nicegl
 {
-	struct Material
+	class Material
 	{
 
 	};
