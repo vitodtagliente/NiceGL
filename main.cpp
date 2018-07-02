@@ -19,7 +19,7 @@ using namespace nicegl;
 using namespace std;
 
 tests::Application* create_test_application() {
-	return new tests::SquareApplication();
+	return new tests::ProjectionApplication();
 }
 
 int main(void)

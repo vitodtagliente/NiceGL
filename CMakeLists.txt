@@ -21,8 +21,9 @@ include_directories(
 	include/
     vendor/glad/include/
 	vendor/glm/
-	vendor/stb
-	vendor/imgui/include
+	vendor/stb/
+	vendor/imgui/include/
+	vendor/math4games/
 )
 
 file(GLOB VENDORS_SOURCES 

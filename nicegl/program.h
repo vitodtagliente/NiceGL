@@ -99,6 +99,11 @@ namespace nicegl
 			glUniform4f(getUniformLocation(name), f1, f2, f3, f4);
 		}
 
+		// set uniform matrix data
+		void set(const std::string& name, const float * const matrix) {
+			glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, matrix);
+		}
+
 	private:
 		// get uniform variable location 
 		inline int getUniformLocation(const std::string& name) {

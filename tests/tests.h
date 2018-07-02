@@ -12,3 +12,5 @@
 #include "square_application.h"
 // applying a texture to a square
 #include "texture_application.h"
+// projection test application
+#include "projection_application.h"
