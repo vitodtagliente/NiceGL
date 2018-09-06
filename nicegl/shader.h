@@ -13,7 +13,7 @@ namespace nicegl
 		GeometryShader
 	};
 
-	enum class ShaderStatus
+	enum class ShaderState
 	{
 		Compiled,
 		Error,
@@ -24,7 +24,7 @@ namespace nicegl
 	{
 	private:
 		ShaderType type{ ShaderType::VertexShader };
-		ShaderStatus status{ ShaderStatus::Unloaded };
+		ShaderState state{ ShaderState::Unloaded };
 
 		// the shader id
 		unsigned int id{ 0 };
@@ -46,26 +46,26 @@ namespace nicegl
 			glShaderSource(id, 1, &source_pointer, NULL);
 			glCompileShader(id);
 
-			int compile_status;
-			glGetShaderiv(id, GL_COMPILE_STATUS, &compile_status);
-			if (!compile_status)
+			int compile_state;
+			glGetShaderiv(id, GL_COMPILE_STATUS, &compile_state);
+			if (!compile_state)
 			{
-				status = ShaderStatus::Error;
+				state = ShaderState::Error;
 				char log[1024];
 				glGetShaderInfoLog(id, 1024, NULL, log);
 				error_message = std::string{ log };
 			}
-			else status = ShaderStatus::Compiled;
+			else state = ShaderState::Compiled;
 		}
 
 		~Shader() {
 			glDeleteShader(id);
-			status = ShaderStatus::Unloaded;
+			state = ShaderState::Unloaded;
 		}
 
 		inline unsigned int getId() const { return id; }
 		inline ShaderType getType() const { return type; }
-		inline ShaderStatus getStatus() const { return status; }
+		inline ShaderState getState() const { return state; }
 		inline std::string getErrorMessage() const { return error_message; }
 	};
 

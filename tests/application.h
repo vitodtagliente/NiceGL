@@ -28,7 +28,7 @@ namespace tests
 
 			// compile vertex shader
 			VertexShader vs(sources[ShaderType::VertexShader]);
-			if (vs.getStatus() == ShaderStatus::Error) {
+			if (vs.getState() == ShaderState::Error) {
 				std::cout << vs.getErrorMessage() << std::endl;
 			}
 			else
@@ -39,7 +39,7 @@ namespace tests
 
 			// compile fragment shader
 			FragmentShader fs(sources[ShaderType::FragmentShader]);
-			if (fs.getStatus() == ShaderStatus::Error) {
+			if (fs.getState() == ShaderState::Error) {
 				std::cout << fs.getErrorMessage() << std::endl;
 			}
 			else
@@ -50,7 +50,7 @@ namespace tests
 
 			// compile the shader program
 			Program* program = new Program({ &vs, &fs });
-			if (program->getStatus() == ShaderStatus::Error) {
+			if (program->getState() == ShaderState::Error) {
 				std::cout << program->getErrorMessage() << std::endl;
 			}
 

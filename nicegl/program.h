@@ -11,7 +11,7 @@ namespace nicegl
 		// the program id
 		unsigned int id{ 0 };
 		// program status
-		ShaderStatus status{ ShaderStatus::Unloaded };
+		ShaderState state{ ShaderState::Unloaded };
 		// cache uniforms locations
 		std::map<std::string, int> uniforms{};
 		// error message
@@ -39,7 +39,7 @@ namespace nicegl
 			glGetShaderiv(id, GL_COMPILE_STATUS, &compile_status);
 			if (!compile_status)
 			{
-				status = ShaderStatus::Error;
+				state = ShaderState::Error;
 				// store the error message
 				char log[1024];
 				glGetShaderInfoLog(id, 1024, NULL, log);
@@ -56,7 +56,7 @@ namespace nicegl
 					if (shader)
 						glDetachShader(id, shader->getId());
 				}
-				status = ShaderStatus::Compiled;
+				state = ShaderState::Compiled;
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace nicegl
 		}
 
 		inline unsigned int getId() const { return id; }
-		inline ShaderStatus getStatus() const { return status; }
+		inline ShaderState getState() const { return state; }
 		inline std::string getErrorMessage() const { return error_message; }
 
 		// set uniforms

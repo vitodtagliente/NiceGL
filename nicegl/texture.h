@@ -21,7 +21,7 @@ namespace nicegl
 		unsigned int filterMax{ GL_LINEAR };
 	};
 
-	enum class TextureStatus
+	enum class TextureState
 	{
 		Loaded,
 		Error
@@ -43,7 +43,7 @@ namespace nicegl
 		// Format of loaded image
 		unsigned int image_format{ GL_RGBA };
 		// texture status
-		TextureStatus status{ TextureStatus::Error };
+		TextureState state{ TextureState::Error };
 
 	public:
 		Texture(unsigned char * const image_data_buffer, const int image_width, const int image_height, 
@@ -78,7 +78,7 @@ namespace nicegl
 					0, image_format, GL_UNSIGNED_BYTE, data_buffer
 				);
 
-				status = TextureStatus::Loaded;
+				state = TextureState::Loaded;
 			}			
 		}
 
@@ -98,6 +98,6 @@ namespace nicegl
 		inline unsigned int getId() const { return id; }
 		inline int getWidth() const { return width;	}
 		inline int getHeight() const { return height; }
-		inline TextureStatus getStatus() const { return status; }
+		inline TextureState getState() const { return state; }
 	};
 }
